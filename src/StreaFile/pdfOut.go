@@ -35,7 +35,7 @@ func PdfOut(json []byte, drugName string) {
 
 	err := os.WriteFile(filePath, json, 0644)
 
-	//err = pdf.OutputFileAndClose(filePath)
+	err = pdf.OutputFileAndClose(filePath)
 	if err != nil {
 		fmt.Println("Error saving TEXT:", err)
 		return
