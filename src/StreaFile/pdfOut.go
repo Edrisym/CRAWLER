@@ -4,15 +4,18 @@ import (
 	"fmt"
 	"github.com/jung-kurt/gofpdf/v2"
 	"os"
+	"strings"
 )
 
-func PdfOut(json []byte) {
-	// Define the folder where you want to save the PDF
+func PdfOut(json []byte, drugName string) {
+
 	folderPath := "output"
-	fileName := "drugs.pdf"
+
+	words := []string{"drugs", "-", drugName, ".txt"}
+	fileName := strings.TrimSpace(strings.Join(words, ""))
+
 	filePath := fmt.Sprintf("%s/%s", folderPath, fileName)
 
-	// Create the folder if it doesn't exist
 	if _, err := os.Stat(folderPath); os.IsNotExist(err) {
 		err := os.Mkdir(folderPath, os.ModePerm)
 		if err != nil {
@@ -20,6 +23,7 @@ func PdfOut(json []byte) {
 			return
 		}
 	}
+	text := string(json)
 
 	pdf := gofpdf.New("P", "mm", "A4", "")
 
@@ -27,13 +31,15 @@ func PdfOut(json []byte) {
 
 	pdf.SetFont("Arial", "B", 16)
 
-	pdf.Cell(40, 10, string(json))
+	pdf.Cell(40, 10, text)
 
-	err := pdf.OutputFileAndClose(filePath)
+	err := os.WriteFile(filePath, json, 0644)
+
+	//err = pdf.OutputFileAndClose(filePath)
 	if err != nil {
-		fmt.Println("Error saving PDF:", err)
+		fmt.Println("Error saving TEXT:", err)
 		return
 	}
 
-	fmt.Println("PDF saved successfully at", filePath)
+	fmt.Println("TEXT saved successfully at", filePath)
 }

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gocolly/colly/v2"
+	"github.com/gorilla/mux"
 	"net/http"
 	"strings"
 )
@@ -26,17 +27,19 @@ func Scrapper(w http.ResponseWriter, r *http.Request) {
 	c := colly.NewCollector()
 	var products []Product
 
-	// Base URL with placeholders
-	//urlTemplate := "https://irc.fda.gov.ir/nfi/Search?Term={term}&PageNumber={page}&PageSize={size}&Count={count}"
+	vars := mux.Vars(r)
+	drugName := vars["drugName"]
 
-	//url := strings.Replace(urlTemplate, "{term}", "baricitinib", -1)
-	//url = strings.Replace(url, "{page}", "1", -1)
-	//url = strings.Replace(url, "{size}", "1", -1)
+	//fmt.Fprintf(w, "Scraping data for ID: %d", drugName)
+
+	// Base URL with placeholders
+	urlTemplate := "https://irc.fda.gov.ir/nfi/Search?Term={drugName}&PageNumber={page}&PageSize={size}&Count={count}"
+
+	url := strings.Replace(urlTemplate, "{drugName}", drugName, -1)
+	url = strings.Replace(url, "{page}", "1", -1)
+	url = strings.Replace(url, "{size}", "1000", -1)
 	//url = strings.Replace(url, "{count}", "0", -1)
 
-	url := "https://irc.fda.gov.ir/nfi/Search?Term=baricitinib"
-	//&PageNumber=1&PageSize=1&Count=0
-	// Set up a callback function for when a visited HTML page is parsed
 	c.OnHTML(".RowSearchSty", func(e *colly.HTMLElement) {
 		product := Product{}
 
@@ -70,7 +73,7 @@ func Scrapper(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	StreaFile.PdfOut(jsonData)
+	StreaFile.PdfOut(jsonData, drugName)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
