@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/xuri/excelize/v2"
 	"log"
+	"strings"
 )
 
 type Product struct {
@@ -18,7 +19,7 @@ type Product struct {
 	GenericCode   string `json:"generic_code"`
 }
 
-func ToExcel(jsonData []byte) {
+func ToExcel(jsonData []byte, drugName string) {
 
 	// Unmarshal the JSON data into a slice of Product structs
 	var products []Product
@@ -68,8 +69,10 @@ func ToExcel(jsonData []byte) {
 	// Set the active sheet
 	f.SetActiveSheet(index)
 
-	// Save the file
-	if err := f.SaveAs("ksjkdcks.xlsx"); err != nil {
+	words := []string{"Excel-Drug", drugName, ".xlsx"}
+	fileName := strings.TrimSpace(strings.Join(words, ""))
+
+	if err := f.SaveAs(fileName); err != nil {
 		log.Fatal(err)
 	}
 

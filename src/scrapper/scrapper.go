@@ -76,7 +76,7 @@ func Scrapper(w http.ResponseWriter, r *http.Request) {
 
 	StreamFile.TextOut(jsonData, drugName)
 
-	Excelizing.ToExcel(jsonData)
+	Excelizing.ToExcel(jsonData, drugName)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
