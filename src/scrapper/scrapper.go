@@ -64,7 +64,8 @@ func Scrapper(w http.ResponseWriter, r *http.Request) {
 
 	err := c.Visit(url)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		//http.Error(w, err.Error(), http.StatusInternalServerError)
+		fmt.Println("Visit error: No data is available", err)
 		return
 	}
 
