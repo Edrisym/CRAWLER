@@ -1,4 +1,4 @@
-package main
+package Excelizing
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-func excelized() {
+func ToExcelize(json string) {
 
 	f := excelize.NewFile()
 
