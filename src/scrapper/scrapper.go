@@ -1,7 +1,8 @@
 package Scrapper
 
 import (
-	"CrawlerBot/StreaFile"
+	"CrawlerBot/Excelizing"
+	"CrawlerBot/StreamFile"
 	"encoding/json"
 	"fmt"
 	"github.com/gocolly/colly/v2"
@@ -73,7 +74,9 @@ func Scrapper(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	StreaFile.PdfOut(jsonData, drugName)
+	StreamFile.TextOut(jsonData, drugName)
+
+	Excelizing.ToExcel(jsonData)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

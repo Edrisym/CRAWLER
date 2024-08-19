@@ -2,12 +2,11 @@ package StreamFile
 
 import (
 	"fmt"
-	"github.com/jung-kurt/gofpdf/v2"
 	"os"
 	"strings"
 )
 
-func PdfOut(json []byte, drugName string) {
+func TextOut(json []byte, drugName string) {
 
 	folderPath := "output"
 
@@ -23,15 +22,15 @@ func PdfOut(json []byte, drugName string) {
 			return
 		}
 	}
-	text := string(json)
-
-	pdf := gofpdf.New("P", "mm", "A4", "")
-
-	pdf.AddPage()
-
-	pdf.SetFont("Arial", "B", 16)
-
-	pdf.Cell(40, 10, text)
+	//text := string(json)
+	//
+	//pdf := gofpdf.New("P", "mm", "A4", "")
+	//
+	//pdf.AddPage()
+	//
+	//pdf.SetFont("Arial", "B", 16)
+	//
+	//pdf.Cell(40, 10, text)
 
 	err := os.WriteFile(filePath, json, 0644)
 
