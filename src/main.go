@@ -11,7 +11,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/api/v1/scrapper/{drugName}", Scrapper.Scrapper).Methods(http.MethodGet)
-	fmt.Println("Listening on http://localhost:8080")
+	fmt.Println("Listening on http://localhost:8080/api/v1/scrapper/")
 	err := http.ListenAndServe(":8080", r)
 	if err != nil {
 		return

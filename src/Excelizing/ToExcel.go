@@ -51,11 +51,9 @@ func ToExcel(jsonData []byte, drugName string) {
 		}
 	}
 
-	// Populate the sheet with the data
 	for i, product := range products {
-		row := i + 2 // Start from the second row
+		row := i + 2
 
-		// Set each cell's value
 		f.SetCellValue(sheetName, fmt.Sprintf("A%d", row), product.PersianName)
 		f.SetCellValue(sheetName, fmt.Sprintf("B%d", row), product.EnglishName)
 		f.SetCellValue(sheetName, fmt.Sprintf("C%d", row), product.BrandOwner)
@@ -66,7 +64,6 @@ func ToExcel(jsonData []byte, drugName string) {
 		f.SetCellValue(sheetName, fmt.Sprintf("H%d", row), product.GenericCode)
 	}
 
-	// Set the active sheet
 	f.SetActiveSheet(index)
 
 	words := []string{"Excel-Drug", drugName, ".xlsx"}
