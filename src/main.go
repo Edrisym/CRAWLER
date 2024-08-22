@@ -14,6 +14,7 @@ func main() {
 	fmt.Println("Listening on http://localhost:8080/api/v1/scrapper/")
 	err := http.ListenAndServe(":8080", r)
 	if err != nil {
+		fmt.Println("Visit error: No data is available", err)
 		return
 	}
 }
