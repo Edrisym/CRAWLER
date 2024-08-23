@@ -2,6 +2,8 @@ package Scrapper
 
 import (
 	"CrawlerBot/Excelizing"
+	"CrawlerBot/Product"
+	"CrawlerBot/ProductDetail"
 	"CrawlerBot/StreamFile"
 	"encoding/json"
 	"fmt"
@@ -11,26 +13,9 @@ import (
 	"strings"
 )
 
-type ProductDetails struct {
-	PriceUnit string `json:"PriceUnit"`
-	Date      string `json:"Date"`
-}
-
-type Product struct {
-	PersianName    string         `json:"persian_name"`
-	EnglishName    string         `json:"english_name"`
-	BrandOwner     string         `json:"brand_owner"`
-	LicenseHolder  string         `json:"license_holder"`
-	Price          string         `json:"price"`
-	Packaging      string         `json:"packaging"`
-	ProductCode    string         `json:"product_code"`
-	GenericCode    string         `json:"generic_code"`
-	ProductDetails ProductDetails `json:"product_details"`
-}
-
 func Scrapper(w http.ResponseWriter, r *http.Request) {
 	c := colly.NewCollector()
-	var products []Product
+	var products []Product.Product
 
 	vars := mux.Vars(r)
 	drugName := vars["drugName"]
@@ -42,26 +27,25 @@ func Scrapper(w http.ResponseWriter, r *http.Request) {
 	url = strings.Replace(url, "{page}", "1", -1)
 	url = strings.Replace(url, "{size}", "1000", -1)
 
+	product := Product.Product{}
 	c.OnHTML(".RowSearchSty", func(e *colly.HTMLElement) {
-		product := Product{}
 
 		product.PersianName = e.ChildText(".titleSearch-Link-RtlAlter a")
 		link := e.ChildAttr(".titleSearch-Link-RtlAlter a", "href")
 		detail := detailUrl + link
 
-		c.OnHTML(".row", func(h *colly.HTMLElement) {
-			h.Request.Visit(detail)
-			s := h.ChildText(".txtSearch:contains('تاریخ اعتبار پروانه') + .txtAlignLTRFa")
-			product.ProductDetails.Date = s
-			fmt.Println(s)
-		})
+		err := c.Visit(detail)
+		if err != nil {
+			fmt.Println("Error visiting detail page:", err)
+		}
+
 		product.EnglishName = e.ChildText(".titleSearch-Link-ltrAlter a")
 
 		product.BrandOwner = e.ChildText(".txtSearch:contains('صاحب برند') + .txtSearch1")
 
 		product.LicenseHolder = e.ChildText(".txtSearch:contains('صاحب پروانه') + .txtSearch1")
 
-		price := e.ChildText(".priceTxt") // This extracts "14,893,200"
+		price := e.ChildText(".priceTxt")
 		priceUnit := "ریال"
 		product.Price = fmt.Sprintf("%s %s", strings.TrimSpace(price), strings.TrimSpace(priceUnit))
 
@@ -72,19 +56,38 @@ func Scrapper(w http.ResponseWriter, r *http.Request) {
 		products = append(products, product)
 	})
 
+	c.OnHTML(".row", func(e *colly.HTMLElement) {
+		date := e.ChildText(".txtSearch:contains('تاریخ اعتبار پروانه') + .txtAlignLTRFa")
+		if date != "" {
+			pd := ProductDetail.ProductDetails{
+				LicenceDate: date,
+			}
+			product.ProductDetails = pd
+		}
+	})
+
 	err := c.Visit(url)
 	if err != nil {
-		//http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		fmt.Println("Visit error: No data is available", err)
 		return
 	}
 
 	jsonData, err := json.MarshalIndent(products, "", "  ")
 	if err != nil {
-		//http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		fmt.Println("Visit error: No data is available", err)
 		return
 	}
+
+	//marshaledData := json.Unmarshal(jsonData, &products)
+	//fmt.Println(marshaledData)
+	//if marshaledData == nil {
+	//	w.Header().Set("Content-Type", "application/json")
+	//	w.WriteHeader(http.StatusNotFound)
+	//	w.Write([]byte("No data is available"))
+	//	return
+	//}
 
 	StreamFile.TextOut(jsonData, drugName)
 

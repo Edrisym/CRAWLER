@@ -6,8 +6,7 @@ import (
 	"strings"
 )
 
-func TextOut(json []byte, drugName string) {
-
+func TextOut(dataJson []byte, drugName string) {
 	folderPath := "output"
 
 	words := []string{"drugs", "-", drugName, ".txt"}
@@ -23,7 +22,7 @@ func TextOut(json []byte, drugName string) {
 		}
 	}
 
-	err := os.WriteFile(filePath, json, 0644)
+	err := os.WriteFile(filePath, dataJson, 0644)
 
 	//err = pdf.OutputFileAndClose(filePath)
 	if err != nil {

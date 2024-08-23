@@ -1,6 +1,7 @@
 package Excelizing
 
 import (
+	"CrawlerBot/Product"
 	"encoding/json"
 	"fmt"
 	"github.com/xuri/excelize/v2"
@@ -8,21 +9,10 @@ import (
 	"strings"
 )
 
-type Product struct {
-	PersianName   string `json:"persian_name"`
-	EnglishName   string `json:"english_name"`
-	BrandOwner    string `json:"brand_owner"`
-	LicenseHolder string `json:"license_holder"`
-	Price         string `json:"price"`
-	Packaging     string `json:"packaging"`
-	ProductCode   string `json:"product_code"`
-	GenericCode   string `json:"generic_code"`
-}
-
 func ToExcel(jsonData []byte, drugName string) {
 
 	// Unmarshal the JSON data into a slice of Product structs
-	var products []Product
+	var products []Product.Product
 	if err := json.Unmarshal(jsonData, &products); err != nil {
 		log.Fatal(err)
 	}
@@ -41,6 +31,7 @@ func ToExcel(jsonData []byte, drugName string) {
 		"Packaging",
 		"Product Code",
 		"Generic Code",
+		"Licence Date",
 	}
 
 	// Add headers to the first row
@@ -62,11 +53,12 @@ func ToExcel(jsonData []byte, drugName string) {
 		f.SetCellValue(sheetName, fmt.Sprintf("F%d", row), product.Packaging)
 		f.SetCellValue(sheetName, fmt.Sprintf("G%d", row), product.ProductCode)
 		f.SetCellValue(sheetName, fmt.Sprintf("H%d", row), product.GenericCode)
+		f.SetCellValue(sheetName, fmt.Sprintf("I%d", row), product.ProductDetails.LicenceDate)
 	}
 
 	f.SetActiveSheet(index)
 
-	words := []string{"Excel-Drug", drugName, ".xlsx"}
+	words := []string{"Excel-Drug-", drugName, ".xlsx"}
 	fileName := strings.TrimSpace(strings.Join(words, ""))
 
 	if err := f.SaveAs(fileName); err != nil {
